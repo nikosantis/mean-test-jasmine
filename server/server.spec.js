@@ -84,6 +84,7 @@ describe('Testing Router', () => {
   })
 
   describe('POST - SAVE PIN', () => {
+    // 200
     it('should return 200', done => {
       const post = [{
         title: 'Post Nombre',
@@ -96,7 +97,7 @@ describe('Testing Router', () => {
             title: 'title',
             description: 'description',
             reader: false,
-            url: 'http://platzi.com'
+            url: 'http://nikolas.com'
           }
         ]
       }]
@@ -108,13 +109,83 @@ describe('Testing Router', () => {
         Promise.resolve('<title>Post Nombre</title><meta name="description" content="Nikolas rules">')
       )
 
-      const assets = [{ url: 'http://platzi.com' }]
+      const assets = [{ url: 'http://nikolas.com' }]
 
       axios.post(
         'http://localhost:3000/api',
         { title: 'title', author: 'author', description: 'description', assets })
         .then(res => {
           expect(res.status).toBe(200)
+          done()
+        })
+    })
+
+    // 200
+    it('should return 200 PDF', done => {
+      spyOn(Pins, 'create').and.callFake((pins, callBack) => {
+        callBack(false, {})
+      })
+
+      const assets = [{ url: 'http://nikolas.pdf' }]
+
+      axios.post(
+        'http://localhost:3000/api',
+        { title: 'title', author: 'author', description: 'description', assets })
+        .then(res => {
+          expect(res.status).toBe(200)
+          done()
+        })
+    })
+
+    // 500 requestPromise
+    it('should return 500', done => {
+      const post = [{
+        title: 'Post Nombre',
+        author: 'Nikolas',
+        description: 'Nikolas rules',
+        percentage: 0,
+        tags: [],
+        assets: [
+          {
+            title: 'title',
+            description: 'description',
+            reader: false,
+            url: 'http://nikolas.com'
+          }
+        ]
+      }]
+      spyOn(Pins, 'create').and.callFake((pin, callBack) => {
+        callBack(true, {})
+      })
+
+      spyOn(requestPromise, 'get').and.returnValue(
+        Promise.resolve('<title>Post Nombre</title><meta name="description" content="Nikolas rules">')
+      )
+
+      const assets = [{ url: 'http://nikolas.com' }]
+
+      axios.post(
+        'http://localhost:3000/api',
+        { title: 'title', author: 'author', description: 'description', assets })
+        .catch(error => {
+          expect(error.response.status).toBe(500)
+          done()
+        })
+    })
+
+    // 500 create
+    it('should return 500', done => {
+      spyOn(Pins, 'create').and.callFake((pins, callBack) => {
+        callBack(true, {})
+      })
+
+      const assets = [{ url: 'http://nikolas.com' }]
+
+      axios.post(
+        'http://localhost:3000/api',
+        { title: 'title', author: 'author', description: 'description', assets })
+        .catch(error => {
+          expect(error.response.status).toBe(500)
           done()
         })
     })
