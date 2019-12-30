@@ -4,6 +4,8 @@ const http = require('http')
 const PinsRouter = require('./routes/pins')
 const Pins = require('./models/Pins')
 const request = require('request')
+const requestPromise = require('request-promise-native')
+const axios = require('axios')
 
 const app = express()
 
@@ -78,6 +80,43 @@ describe('Testing Router', () => {
         expect(res.statusCode).toBe(500)
         done()
       })
+    })
+  })
+
+  describe('POST - SAVE PIN', () => {
+    it('should return 200', done => {
+      const post = [{
+        title: 'Post Nombre',
+        author: 'Nikolas',
+        description: 'Nikolas rules',
+        percentage: 0,
+        tags: [],
+        assets: [
+          {
+            title: 'title',
+            description: 'description',
+            reader: false,
+            url: 'http://platzi.com'
+          }
+        ]
+      }]
+      spyOn(Pins, 'create').and.callFake((pin, callBack) => {
+        callBack(false, {})
+      })
+
+      spyOn(requestPromise, 'get').and.returnValue(
+        Promise.resolve('<title>Post Nombre</title><meta name="description" content="Nikolas rules">')
+      )
+
+      const assets = [{ url: 'http://platzi.com' }]
+
+      axios.post(
+        'http://localhost:3000/api',
+        { title: 'title', author: 'author', description: 'description', assets })
+        .then(res => {
+          expect(res.status).toBe(200)
+          done()
+        })
     })
   })
 })
