@@ -41,3 +41,6 @@ Thumbs.db
 
 # nyc test coverage
 .nyc_output
+
+# istanbul spec
+spec/istanbul/*
